@@ -35,5 +35,9 @@ class AppConstants {
   // SharedPreferences Keys
   static const String keyCurrentUser = 'currentUser';
 
+  // Leave Default Allocations
+  static const int defaultCasualLeave = 12;
+  static const int defaultSickLeave = 10;
+  static const int defaultEarnedLeave = 15;
 
 }
