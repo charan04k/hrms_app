@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_time_utils.dart';
+import '../../bloc/auth/auth_bloc.dart';
+import '../../bloc/auth/auth_event.dart';
+import '../../bloc/auth/auth_state.dart';
+import '../login/login_screen.dart';
 import '../widget/clock_status_card.dart';
 
 
@@ -25,7 +30,6 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-
       appBar: AppBar(
         title: Row(
           children: [
@@ -34,46 +38,58 @@ class DashboardScreen extends StatelessWidget {
               height: 36,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.primaryGradientStart,
-                    AppColors.primaryGradientEnd,
-                  ],
+                  colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd],
                 ),
                 shape: BoxShape.circle,
               ),
               child: const Center(
-                child: Icon(
-                  Icons.person_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                child: Icon(Icons.person_rounded, color: Colors.white, size: 20),
               ),
             ),
             const SizedBox(width: 12),
+            BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                final name = state is AuthAuthenticated
+                    ? state.user.name
+                    : AppConstants.demoEmployeeName;
+                final desig = state is AuthAuthenticated
+                    ? state.user.designation
+                    : AppConstants.demoDesignation;
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${DateTimeUtils.getGreeting()}, $employeeName',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  designation,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${DateTimeUtils.getGreeting()}, $name',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      desig,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Logout',
+            icon: const Icon(Icons.logout_rounded, color: AppColors.textSecondary),
+            onPressed: () {
+              _showLogoutDialog(context);
+            },
+          ),
+        ],
       ),
 
       body: RefreshIndicator(
@@ -229,6 +245,35 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out from Pulse HRMS?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<AuthBloc>().add(const AuthLogoutRequested());
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.absent),
+            child: const Text('Sign Out'),
+          ),
+        ],
       ),
     );
   }
