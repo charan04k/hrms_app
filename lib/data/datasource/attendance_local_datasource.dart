@@ -1,6 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../core/constants/app_constants.dart';
-
 import '../../core/errors/failures.dart';
 import '../../core/utils/date_time_utils.dart';
 import '../models/attendance_model.dart';
@@ -11,7 +10,8 @@ abstract class AttendanceLocalDataSource {
   Future<AttendanceModel> clockOut({DateTime? time});
   Future<List<AttendanceModel>> getAttendanceHistory(int year, int month);
   Future<List<AttendanceModel>> getAllAttendance();
-
+  Future<void> markDaysOnLeave(DateTime startDate, DateTime endDate);
+  Future<void> seedInitialAttendanceIfEmpty();
 }
 
 class AttendanceLocalDataSourceImpl implements AttendanceLocalDataSource {
@@ -108,4 +108,80 @@ class AttendanceLocalDataSourceImpl implements AttendanceLocalDataSource {
     return list;
   }
 
+  @override
+  Future<void> markDaysOnLeave(DateTime startDate, DateTime endDate) async {
+    var curr = DateTime(startDate.year, startDate.month, startDate.day);
+    final end = DateTime(endDate.year, endDate.month, endDate.day);
+
+    while (curr.isBefore(end) || curr.isAtSameMomentAs(end)) {
+      final key = DateTimeUtils.formatDateKey(curr);
+      final record = AttendanceModel(
+        id: 'leave_${curr.millisecondsSinceEpoch}',
+        date: curr,
+        status: AttendanceStatus.onLeave,
+        totalWorkingMinutes: 0,
+        notes: 'Approved Leave',
+      );
+      await attendanceBox.put(key, record.toMap());
+      curr = curr.add(const Duration(days: 1));
+    }
+  }
+
+  @override
+  Future<void> seedInitialAttendanceIfEmpty() async {
+    if (attendanceBox.isNotEmpty) return;
+
+    final now = DateTime.now();
+    // Seed records for previous 45 days
+    for (int i = 45; i >= 1; i--) {
+      final day = now.subtract(Duration(days: i));
+      final dateOnly = DateTime(day.year, day.month, day.day);
+      final key = DateTimeUtils.formatDateKey(dateOnly);
+
+      // Check if weekend (Saturday = 6, Sunday = 7)
+      if (day.weekday == DateTime.saturday || day.weekday == DateTime.sunday) {
+        final holidayRecord = AttendanceModel(
+          id: 'seed_hol_$key',
+          date: dateOnly,
+          status: AttendanceStatus.holiday,
+          notes: day.weekday == DateTime.sunday ? 'Sunday Weekly Off' : 'Saturday Off',
+        );
+        await attendanceBox.put(key, holidayRecord.toMap());
+      } else if (i == 12 || i == 13) {
+        // Sample Approved Leave
+        final leaveRecord = AttendanceModel(
+          id: 'seed_leave_$key',
+          date: dateOnly,
+          status: AttendanceStatus.onLeave,
+          notes: 'Casual Leave (Approved)',
+        );
+        await attendanceBox.put(key, leaveRecord.toMap());
+      } else if (i == 25) {
+        // Sample Absent day
+        final absentRecord = AttendanceModel(
+          id: 'seed_abs_$key',
+          date: dateOnly,
+          status: AttendanceStatus.absent,
+          notes: 'Unexcused Absence',
+        );
+        await attendanceBox.put(key, absentRecord.toMap());
+      } else {
+        // Normal Working Day
+        final clockIn = DateTime(day.year, day.month, day.day, 9, 15 + (i % 15));
+        final clockOut = DateTime(day.year, day.month, day.day, 17, 45 + (i % 20));
+        final diff = clockOut.difference(clockIn).inMinutes;
+
+        final presentRecord = AttendanceModel(
+          id: 'seed_pres_$key',
+          date: dateOnly,
+          clockInTime: clockIn,
+          clockOutTime: clockOut,
+          status: AttendanceStatus.present,
+          totalWorkingMinutes: diff,
+          notes: 'Regular 8h Shift',
+        );
+        await attendanceBox.put(key, presentRecord.toMap());
+      }
+    }
+  }
 }

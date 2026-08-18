@@ -2,6 +2,7 @@ import '../../domain/entities/attendance_entity.dart';
 import '../../domain/repositories/attendance/attendance_repository.dart';
 import '../datasource/attendance_local_datasource.dart';
 
+
 class AttendanceRepositoryImpl implements AttendanceRepository {
   final AttendanceLocalDataSource localDataSource;
 
@@ -32,4 +33,13 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     return localDataSource.getAllAttendance();
   }
 
+  @override
+  Future<void> markDaysOnLeave(DateTime startDate, DateTime endDate) {
+    return localDataSource.markDaysOnLeave(startDate, endDate);
+  }
+
+  @override
+  Future<void> seedInitialAttendanceIfEmpty() {
+    return localDataSource.seedInitialAttendanceIfEmpty();
+  }
 }

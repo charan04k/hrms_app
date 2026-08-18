@@ -96,5 +96,5 @@ Future<void> initDependencies() async {
       getAttendanceHistoryUseCase: sl(),
     ),
   );
-
+  await sl<AttendanceRepository>().seedInitialAttendanceIfEmpty();
 }

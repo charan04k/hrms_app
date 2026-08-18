@@ -5,6 +5,18 @@ enum AttendanceStatus {
   holiday,
 }
 
+enum LeaveType {
+  casual,
+  sick,
+  earned,
+}
+
+enum LeaveStatus {
+  pending,
+  approved,
+  rejected,
+}
+
 
 class AppConstants {
   // Static Credentials

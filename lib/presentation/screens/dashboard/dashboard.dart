@@ -11,24 +11,14 @@ import '../../bloc/auth/auth_event.dart';
 import '../../bloc/auth/auth_state.dart';
 import '../login/login_screen.dart';
 import '../widget/clock_status_card.dart';
-
-
+import '../widget/status_badge.dart';
 class DashboardScreen extends StatelessWidget {
   final Function(int)? onNavigateTab;
 
-  const DashboardScreen({
-    super.key,
-    this.onNavigateTab,
-  });
+  const DashboardScreen({super.key, this.onNavigateTab});
 
   @override
   Widget build(BuildContext context) {
-    final String employeeName = AppConstants.demoEmployeeName;
-    final String designation = AppConstants.demoDesignation;
-
-    final bool isClockedIn = false;
-
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -39,16 +29,12 @@ class DashboardScreen extends StatelessWidget {
               height: 36,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.primaryGradientStart,
-                    AppColors.primaryGradientEnd
-                  ],
+                  colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd],
                 ),
                 shape: BoxShape.circle,
               ),
               child: const Center(
-                child: Icon(
-                    Icons.person_rounded, color: Colors.white, size: 20),
+                child: Icon(Icons.person_rounded, color: Colors.white, size: 20),
               ),
             ),
             const SizedBox(width: 12),
@@ -89,15 +75,13 @@ class DashboardScreen extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: 'Logout',
-            icon: const Icon(
-                Icons.logout_rounded, color: AppColors.textSecondary),
+            icon: const Icon(Icons.logout_rounded, color: AppColors.textSecondary),
             onPressed: () {
               _showLogoutDialog(context);
             },
           ),
         ],
       ),
-
       body: BlocListener<AttendanceBloc, AttendanceState>(
         listenWhen: (prev, curr) => prev.actionStatus != curr.actionStatus,
         listener: (context, state) {
@@ -123,7 +107,7 @@ class DashboardScreen extends StatelessWidget {
         },
         child: RefreshIndicator(
           onRefresh: () async {
-            context.read<AttendanceBloc>().add(const LoadTodayAttendance());
+            context.read<AttendanceBloc>().add( LoadTodayAttendance());
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -134,7 +118,6 @@ class DashboardScreen extends StatelessWidget {
                 // Live Clock In/Out Status Card
                 BlocBuilder<AttendanceBloc, AttendanceState>(
                   builder: (context, state) {
-                    print(state.todayAttendance);
                     return ClockStatusCard(
                       attendance: state.todayAttendance,
                       isClockedIn: state.isClockedIn,
@@ -151,7 +134,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
-
+                // Quick Actions Header
                 const Text(
                   'Quick Actions',
                   style: TextStyle(
@@ -160,7 +143,6 @@ class DashboardScreen extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-
                 const SizedBox(height: 12),
 
                 Row(
@@ -172,47 +154,39 @@ class DashboardScreen extends StatelessWidget {
                         subtitle: 'Submit request',
                         color: AppColors.primary,
                         onTap: () {
-
+                          // Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //     builder: (_) => const ApplyLeaveScreen(),
+                          //   ),
+                          // );
                         },
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: _QuickActionTile(
                         icon: Icons.calendar_month_rounded,
                         title: 'Attendance',
                         subtitle: 'Monthly records',
                         color: AppColors.onLeave,
-                        onTap: () {
-                          onNavigateTab?.call(1);
-                        },
+                        onTap: () => onNavigateTab?.call(1),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: _QuickActionTile(
                         icon: Icons.list_alt_rounded,
                         title: 'My Requests',
                         subtitle: 'Review & Track',
                         color: AppColors.casualLeave,
-                        onTap: () {
-                          onNavigateTab?.call(2);
-                        },
+                        onTap: () => onNavigateTab?.call(2),
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
 
-                // =========================
-                // RECENT ACTIVITY
-                // =========================
-
+                // Recent Attendance History Feed
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -224,38 +198,93 @@ class DashboardScreen extends StatelessWidget {
                         color: AppColors.textPrimary,
                       ),
                     ),
-
                     TextButton(
-                      onPressed: () {
-
-                      },
+                      onPressed: () => onNavigateTab?.call(1),
                       child: const Text('View All'),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 8),
 
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.cardBorder,
-                    ),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'No recent attendance activity recorded yet.',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
+                BlocBuilder<AttendanceBloc, AttendanceState>(
+                  builder: (context, state) {
+                    final recent = state.monthlyHistory.take(4).toList();
+                    if (recent.isEmpty) {
+                      return Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.cardBorder),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'No recent attendance activity recorded yet.',
+                            style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          ),
+                        ),
+                      );
+                    }
 
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.cardBorder),
+                      ),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: recent.length,
+                        separatorBuilder: (_, _) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final item = recent[index];
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceVariant,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${item.date.day}\n${DateTimeUtils.formatShortMonth(item.date).split(' ').first}',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                  height: 1.1,
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              DateTimeUtils.formatDate(item.date),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            subtitle: Text(
+                              item.clockInTime != null
+                                  ? '${DateTimeUtils.formatTime(item.clockInTime!)} - ${item.clockOutTime != null ? DateTimeUtils.formatTime(item.clockOutTime!) : "In Progress"} (${DateTimeUtils.formatDuration(Duration(minutes: item.totalWorkingMinutes))})'
+                                  : (item.notes ?? 'Off Day'),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            trailing: AttendanceStatusBadge(status: item.status),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(height: 24),
               ],
             ),
@@ -268,37 +297,32 @@ class DashboardScreen extends StatelessWidget {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) =>
-          AlertDialog(
-            title: const Text('Sign Out'),
-            content: const Text(
-                'Are you sure you want to sign out from Pulse HRMS?'),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.read<AuthBloc>().add(const AuthLogoutRequested());
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                        (route) => false,
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.absent),
-                child: const Text('Sign Out'),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out from Pulse HRMS?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<AuthBloc>().add(const AuthLogoutRequested());
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.absent),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
     );
   }
 }
-
 
 class _QuickActionTile extends StatelessWidget {
   final IconData icon;
@@ -320,38 +344,25 @@ class _QuickActionTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-
       child: Container(
         padding: const EdgeInsets.all(12),
-
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: AppColors.cardBorder,
-          ),
+          border: Border.all(color: AppColors.cardBorder),
         ),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-
-              child: Icon(
-                icon,
-                color: color,
-                size: 20,
-              ),
+              child: Icon(icon, color: color, size: 20),
             ),
-
             const SizedBox(height: 10),
-
             Text(
               title,
               style: const TextStyle(
@@ -362,9 +373,7 @@ class _QuickActionTile extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-
             const SizedBox(height: 2),
-
             Text(
               subtitle,
               style: const TextStyle(

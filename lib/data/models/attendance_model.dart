@@ -36,7 +36,7 @@ class AttendanceModel extends AttendanceEntity {
           ? DateTime.parse(map['clockOutTime'] as String)
           : null,
       status: AttendanceStatus.values.firstWhere(
-        (e) => e.name == map['status'],
+            (e) => e.name == map['status'],
         orElse: () => AttendanceStatus.absent,
       ),
       totalWorkingMinutes: (map['totalWorkingMinutes'] as num?)?.toInt() ?? 0,

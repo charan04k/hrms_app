@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
+import '../bloc/attendance/attendance_bloc.dart';
+import '../bloc/attendance/attendance_event.dart';
 import 'dashboard/dashboard.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -22,6 +25,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+
+    context.read<AttendanceBloc>().add(
+       LoadTodayAttendance(),
+    );
+
   }
 
   void _onTabSelected(int index) {

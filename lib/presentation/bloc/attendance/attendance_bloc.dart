@@ -45,9 +45,9 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   }
 
   void _onAttendanceTimerTick(
-    AttendanceTimerTick event,
-    Emitter<AttendanceState> emit,
-  ) {
+      AttendanceTimerTick event,
+      Emitter<AttendanceState> emit,
+      ) {
     if (state.todayAttendance != null && state.todayAttendance!.isClockedIn) {
       final clockIn = state.todayAttendance!.clockInTime!;
       final elapsed = DateTime.now().difference(clockIn);
@@ -59,9 +59,9 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   }
 
   Future<void> _onLoadTodayAttendance(
-    LoadTodayAttendance event,
-    Emitter<AttendanceState> emit,
-  ) async {
+      LoadTodayAttendance event,
+      Emitter<AttendanceState> emit,
+      ) async {
     emit(state.copyWith(isLoading: true));
     try {
       final today = await getTodayAttendanceUseCase();
@@ -106,9 +106,9 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   }
 
   Future<void> _onClockInRequested(
-    ClockInRequested event,
-    Emitter<AttendanceState> emit,
-  ) async {
+      ClockInRequested event,
+      Emitter<AttendanceState> emit,
+      ) async {
     emit(state.copyWith(actionStatus: AttendanceActionStatus.loading));
     try {
       final attendance = await clockInUseCase(time: event.time);
@@ -147,9 +147,9 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   }
 
   Future<void> _onClockOutRequested(
-    ClockOutRequested event,
-    Emitter<AttendanceState> emit,
-  ) async {
+      ClockOutRequested event,
+      Emitter<AttendanceState> emit,
+      ) async {
     emit(state.copyWith(actionStatus: AttendanceActionStatus.loading));
     try {
       final attendance = await clockOutUseCase(time: event.time);
@@ -188,9 +188,9 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   }
 
   Future<void> _onLoadAttendanceHistory(
-    LoadAttendanceHistory event,
-    Emitter<AttendanceState> emit,
-  ) async {
+      LoadAttendanceHistory event,
+      Emitter<AttendanceState> emit,
+      ) async {
     emit(state.copyWith(isLoading: true));
     try {
       final history = await getAttendanceHistoryUseCase(event.year, event.month);
@@ -217,16 +217,16 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   }
 
   Future<void> _onChangeAttendanceMonth(
-    ChangeAttendanceMonth event,
-    Emitter<AttendanceState> emit,
-  ) async {
+      ChangeAttendanceMonth event,
+      Emitter<AttendanceState> emit,
+      ) async {
     add(LoadAttendanceHistory(year: event.year, month: event.month));
   }
 
   void _onFilterAttendanceStatusChanged(
-    FilterAttendanceStatusChanged event,
-    Emitter<AttendanceState> emit,
-  ) {
+      FilterAttendanceStatusChanged event,
+      Emitter<AttendanceState> emit,
+      ) {
     final filtered = _applyFilters(
       state.monthlyHistory,
       event.status,
@@ -242,9 +242,9 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   }
 
   void _onFilterAttendanceDateRangeChanged(
-    FilterAttendanceDateRangeChanged event,
-    Emitter<AttendanceState> emit,
-  ) {
+      FilterAttendanceDateRangeChanged event,
+      Emitter<AttendanceState> emit,
+      ) {
     final isClearing = event.startDate == null && event.endDate == null;
     final filtered = _applyFilters(
       state.monthlyHistory,
@@ -262,11 +262,11 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   }
 
   List<AttendanceEntity> _applyFilters(
-    List<AttendanceEntity> list,
-    AttendanceStatus? status,
-    DateTime? startDate,
-    DateTime? endDate,
-  ) {
+      List<AttendanceEntity> list,
+      AttendanceStatus? status,
+      DateTime? startDate,
+      DateTime? endDate,
+      ) {
     return list.where((item) {
       // Filter by status
       if (status != null && item.status != status) {
