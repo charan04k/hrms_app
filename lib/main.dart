@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hrms_app/presentation/bloc/attendance/attendance_bloc.dart';
 import 'package:hrms_app/presentation/bloc/auth/auth_bloc.dart';
 import 'package:hrms_app/presentation/bloc/auth/auth_event.dart';
 import 'package:hrms_app/presentation/bloc/auth/auth_state.dart';
@@ -27,11 +28,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => di.sl<AuthBloc>()..add(const AuthCheckRequested()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (_) => di.sl<AuthBloc>()..add(const AuthCheckRequested()),
+        ),
+        BlocProvider<AttendanceBloc>(
+          create: (_) => di.sl<AttendanceBloc>(),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Arche HRMS',
+        title: 'Pulse HRMS',
         theme: AppTheme.lightTheme,
         home: const AuthWrapper(),
       ),

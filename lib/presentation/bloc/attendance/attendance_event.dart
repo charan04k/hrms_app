@@ -1,0 +1,72 @@
+import 'package:equatable/equatable.dart';
+import '../../../core/constants/app_constants.dart';
+
+abstract class AttendanceEvent extends Equatable {
+  const AttendanceEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class LoadTodayAttendance extends AttendanceEvent {
+  const LoadTodayAttendance();
+}
+
+class ClockInRequested extends AttendanceEvent {
+  final DateTime? time;
+  const ClockInRequested({this.time});
+
+  @override
+  List<Object?> get props => [time];
+}
+
+class ClockOutRequested extends AttendanceEvent {
+  final DateTime? time;
+  const ClockOutRequested({this.time});
+
+  @override
+  List<Object?> get props => [time];
+}
+
+class LoadAttendanceHistory extends AttendanceEvent {
+  final int year;
+  final int month;
+
+  const LoadAttendanceHistory({required this.year, required this.month});
+
+  @override
+  List<Object?> get props => [year, month];
+}
+
+class ChangeAttendanceMonth extends AttendanceEvent {
+  final int year;
+  final int month;
+
+  const ChangeAttendanceMonth({required this.year, required this.month});
+
+  @override
+  List<Object?> get props => [year, month];
+}
+
+class FilterAttendanceStatusChanged extends AttendanceEvent {
+  final AttendanceStatus? status;
+
+  const FilterAttendanceStatusChanged(this.status);
+
+  @override
+  List<Object?> get props => [status];
+}
+
+class FilterAttendanceDateRangeChanged extends AttendanceEvent {
+  final DateTime? startDate;
+  final DateTime? endDate;
+
+  const FilterAttendanceDateRangeChanged({this.startDate, this.endDate});
+
+  @override
+  List<Object?> get props => [startDate, endDate];
+}
+
+class AttendanceTimerTick extends AttendanceEvent {
+  const AttendanceTimerTick();
+}

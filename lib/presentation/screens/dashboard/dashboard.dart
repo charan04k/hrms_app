@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_time_utils.dart';
+import '../../bloc/attendance/attendance_bloc.dart';
+import '../../bloc/attendance/attendance_event.dart';
+import '../../bloc/attendance/attendance_state.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_event.dart';
 import '../../bloc/auth/auth_state.dart';
@@ -20,12 +23,10 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final String employeeName = AppConstants.demoEmployeeName;
     final String designation = AppConstants.demoDesignation;
 
     final bool isClockedIn = false;
-
 
 
     return Scaffold(
@@ -38,12 +39,16 @@ class DashboardScreen extends StatelessWidget {
               height: 36,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd],
+                  colors: [
+                    AppColors.primaryGradientStart,
+                    AppColors.primaryGradientEnd
+                  ],
                 ),
                 shape: BoxShape.circle,
               ),
               child: const Center(
-                child: Icon(Icons.person_rounded, color: Colors.white, size: 20),
+                child: Icon(
+                    Icons.person_rounded, color: Colors.white, size: 20),
               ),
             ),
             const SizedBox(width: 12),
@@ -84,7 +89,8 @@ class DashboardScreen extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: 'Logout',
-            icon: const Icon(Icons.logout_rounded, color: AppColors.textSecondary),
+            icon: const Icon(
+                Icons.logout_rounded, color: AppColors.textSecondary),
             onPressed: () {
               _showLogoutDialog(context);
             },
@@ -92,134 +98,143 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
 
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await Future.delayed(const Duration(milliseconds: 500));
+      body: BlocListener<AttendanceBloc, AttendanceState>(
+        listenWhen: (prev, curr) => prev.actionStatus != curr.actionStatus,
+        listener: (context, state) {
+          if (state.actionStatus == AttendanceActionStatus.success &&
+              state.successMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.successMessage!),
+                backgroundColor: AppColors.present,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          } else if (state.actionStatus == AttendanceActionStatus.failure &&
+              state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage!),
+                backgroundColor: AppColors.absent,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
         },
-
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              ClockStatusCard(
-                attendance: null,
-                isClockedIn: isClockedIn,
-                elapsedDuration: Duration.zero,
-                isLoading: false,
-
-                onClockIn: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Clock In clicked'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-
-                onClockOut: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Clock Out clicked'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-
-
-              const Text(
-                'Quick Actions',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            context.read<AttendanceBloc>().add(const LoadTodayAttendance());
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Live Clock In/Out Status Card
+                BlocBuilder<AttendanceBloc, AttendanceState>(
+                  builder: (context, state) {
+                    print(state.todayAttendance);
+                    return ClockStatusCard(
+                      attendance: state.todayAttendance,
+                      isClockedIn: state.isClockedIn,
+                      elapsedDuration: state.elapsedWorkingDuration,
+                      isLoading: state.actionStatus == AttendanceActionStatus.loading,
+                      onClockIn: () {
+                        context.read<AttendanceBloc>().add(const ClockInRequested());
+                      },
+                      onClockOut: () {
+                        context.read<AttendanceBloc>().add(const ClockOutRequested());
+                      },
+                    );
+                  },
                 ),
-              ),
+                const SizedBox(height: 20),
 
-              const SizedBox(height: 12),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: _QuickActionTile(
-                      icon: Icons.add_circle_outline_rounded,
-                      title: 'Apply Leave',
-                      subtitle: 'Submit request',
-                      color: AppColors.primary,
-                      onTap: () {
+                const Text(
+                  'Quick Actions',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.add_circle_outline_rounded,
+                        title: 'Apply Leave',
+                        subtitle: 'Submit request',
+                        color: AppColors.primary,
+                        onTap: () {
+
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.calendar_month_rounded,
+                        title: 'Attendance',
+                        subtitle: 'Monthly records',
+                        color: AppColors.onLeave,
+                        onTap: () {
+                          onNavigateTab?.call(1);
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.list_alt_rounded,
+                        title: 'My Requests',
+                        subtitle: 'Review & Track',
+                        color: AppColors.casualLeave,
+                        onTap: () {
+                          onNavigateTab?.call(2);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // =========================
+                // RECENT ACTIVITY
+                // =========================
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Recent Activity',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+
+                    TextButton(
+                      onPressed: () {
 
                       },
+                      child: const Text('View All'),
                     ),
-                  ),
+                  ],
+                ),
 
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: _QuickActionTile(
-                      icon: Icons.calendar_month_rounded,
-                      title: 'Attendance',
-                      subtitle: 'Monthly records',
-                      color: AppColors.onLeave,
-                      onTap: () {
-                        onNavigateTab?.call(1);
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: _QuickActionTile(
-                      icon: Icons.list_alt_rounded,
-                      title: 'My Requests',
-                      subtitle: 'Review & Track',
-                      color: AppColors.casualLeave,
-                      onTap: () {
-                        onNavigateTab?.call(2);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // =========================
-              // RECENT ACTIVITY
-              // =========================
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Recent Activity',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-
-                  TextButton(
-                    onPressed: () {
-
-                    },
-                    child: const Text('View All'),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -241,8 +256,9 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ),
 
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),
@@ -252,35 +268,36 @@ class DashboardScreen extends StatelessWidget {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out from Pulse HRMS?'),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder: (_) =>
+          AlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text(
+                'Are you sure you want to sign out from Pulse HRMS?'),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.read<AuthBloc>().add(const AuthLogoutRequested());
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        (route) => false,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.absent),
+                child: const Text('Sign Out'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<AuthBloc>().add(const AuthLogoutRequested());
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.absent),
-            child: const Text('Sign Out'),
-          ),
-        ],
-      ),
     );
   }
 }
-
-
-
 
 
 class _QuickActionTile extends StatelessWidget {
