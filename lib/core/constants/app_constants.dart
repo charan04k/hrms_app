@@ -30,6 +30,8 @@ class AppConstants {
   // Hive Box Names
   static const String userBoxName = 'userBox';
   static const String attendanceBoxName = 'attendanceBox';
+  static const String leaveBoxName = 'leaveBox';
+  static const String leaveBalanceBoxName = 'leaveBalanceBox';
 
 
   // SharedPreferences Keys

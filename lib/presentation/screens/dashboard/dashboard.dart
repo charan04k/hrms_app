@@ -9,6 +9,15 @@ import '../../bloc/attendance/attendance_state.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_event.dart';
 import '../../bloc/auth/auth_state.dart';
+import '../../bloc/leave/leave_bloc.dart';
+import '../../bloc/leave/leave_event.dart';
+import '../../bloc/leave/leave_state.dart';
+import '../leave/apply_leave_screen.dart';
+import '../login/login_screen.dart';
+import '../widget/clock_status_card.dart';
+import '../widget/leave_balance_card.dart';
+import '../widget/stat_summary_card.dart';
+import '../widget/status_badge.dart';
 
 
 class DashboardScreen extends StatelessWidget {

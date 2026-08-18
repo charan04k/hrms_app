@@ -5,6 +5,7 @@ import 'package:hrms_app/presentation/bloc/attendance/attendance_bloc.dart';
 import 'package:hrms_app/presentation/bloc/auth/auth_bloc.dart';
 import 'package:hrms_app/presentation/bloc/auth/auth_event.dart';
 import 'package:hrms_app/presentation/bloc/auth/auth_state.dart';
+import 'package:hrms_app/presentation/bloc/leave/leave_bloc.dart';
 import 'package:hrms_app/presentation/screens/login/login_screen.dart';
 import 'package:hrms_app/presentation/screens/main_navigation_screen.dart';
 
@@ -35,6 +36,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<AttendanceBloc>(
           create: (_) => di.sl<AttendanceBloc>(),
+        ),
+        BlocProvider<LeaveBloc>(
+          create: (_) => di.sl<LeaveBloc>(),
         ),
       ],
       child: MaterialApp(
