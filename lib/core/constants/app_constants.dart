@@ -1,3 +1,10 @@
+enum AttendanceStatus {
+  present,
+  absent,
+  onLeave,
+  holiday,
+}
+
 
 class AppConstants {
   // Static Credentials
