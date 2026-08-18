@@ -9,9 +9,8 @@ import '../../bloc/attendance/attendance_state.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_event.dart';
 import '../../bloc/auth/auth_state.dart';
-import '../login/login_screen.dart';
-import '../widget/clock_status_card.dart';
-import '../widget/status_badge.dart';
+
+
 class DashboardScreen extends StatelessWidget {
   final Function(int)? onNavigateTab;
 
@@ -107,7 +106,8 @@ class DashboardScreen extends StatelessWidget {
         },
         child: RefreshIndicator(
           onRefresh: () async {
-            context.read<AttendanceBloc>().add( LoadTodayAttendance());
+            context.read<AttendanceBloc>().add(const LoadTodayAttendance());
+            context.read<LeaveBloc>().add(const LoadLeaveData());
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -134,6 +134,59 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
+                // Leave Balances Section
+                BlocBuilder<LeaveBloc, LeaveState>(
+                  builder: (context, state) {
+                    return LeaveBalanceSection(
+                      balance: state.leaveBalance,
+                      onTypeTap: (type) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => ApplyLeaveScreen(initialLeaveType: type),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Quick Stat Cards
+                BlocBuilder<AttendanceBloc, AttendanceState>(
+                  builder: (context, attState) {
+                    return BlocBuilder<LeaveBloc, LeaveState>(
+                      builder: (context, leaveState) {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: StatSummaryCard(
+                                title: 'Present (Month)',
+                                value: '${attState.presentCount} Days',
+                                icon: Icons.verified_rounded,
+                                color: AppColors.present,
+                                backgroundColor: AppColors.presentBg,
+                                onTap: () => onNavigateTab?.call(1),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: StatSummaryCard(
+                                title: 'Pending Leaves',
+                                value: '${leaveState.pendingCount} Requests',
+                                icon: Icons.hourglass_top_rounded,
+                                color: AppColors.pending,
+                                backgroundColor: AppColors.pendingBg,
+                                onTap: () => onNavigateTab?.call(2),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+
                 // Quick Actions Header
                 const Text(
                   'Quick Actions',
@@ -154,11 +207,11 @@ class DashboardScreen extends StatelessWidget {
                         subtitle: 'Submit request',
                         color: AppColors.primary,
                         onTap: () {
-                          // Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (_) => const ApplyLeaveScreen(),
-                          //   ),
-                          // );
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const ApplyLeaveScreen(),
+                            ),
+                          );
                         },
                       ),
                     ),
