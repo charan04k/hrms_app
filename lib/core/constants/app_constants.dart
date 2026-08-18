@@ -13,7 +13,6 @@ class AppConstants {
 
 
   // SharedPreferences Keys
-  static const String keyIsLoggedIn = 'isLoggedIn';
   static const String keyCurrentUser = 'currentUser';
 
 
