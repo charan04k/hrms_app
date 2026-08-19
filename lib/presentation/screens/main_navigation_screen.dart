@@ -4,7 +4,9 @@ import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../bloc/attendance/attendance_bloc.dart';
 import '../bloc/attendance/attendance_event.dart';
+import 'attendence/attendance_history_screen.dart';
 import 'dashboard/dashboard.dart';
+import 'leave/leave_requests_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final int initialIndex;
@@ -42,8 +44,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       DashboardScreen(onNavigateTab: _onTabSelected),
-      // const AttendanceHistoryScreen(),
-      // const LeaveRequestsScreen(),
+      const AttendanceHistoryScreen(),
+      const LeaveRequestsScreen(),
     ];
 
     return Scaffold(
