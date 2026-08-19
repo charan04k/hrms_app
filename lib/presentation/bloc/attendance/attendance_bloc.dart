@@ -111,7 +111,7 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
       ) async {
     emit(state.copyWith(actionStatus: AttendanceActionStatus.loading));
     try {
-      final attendance = await clockInUseCase(time: event.time);
+      final attendance = await clockInUseCase();
       final history = await getAttendanceHistoryUseCase(
         state.selectedYear,
         state.selectedMonth,
@@ -152,7 +152,7 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
       ) async {
     emit(state.copyWith(actionStatus: AttendanceActionStatus.loading));
     try {
-      final attendance = await clockOutUseCase(time: event.time);
+      final attendance = await clockOutUseCase();
       final history = await getAttendanceHistoryUseCase(
         state.selectedYear,
         state.selectedMonth,

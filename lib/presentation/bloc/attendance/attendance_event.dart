@@ -13,19 +13,12 @@ class LoadTodayAttendance extends AttendanceEvent {
 }
 
 class ClockInRequested extends AttendanceEvent {
-  final DateTime? time;
-  const ClockInRequested({this.time});
-
-  @override
-  List<Object?> get props => [time];
+  const ClockInRequested();
 }
 
 class ClockOutRequested extends AttendanceEvent {
-  final DateTime? time;
-  const ClockOutRequested({this.time});
+  const ClockOutRequested();
 
-  @override
-  List<Object?> get props => [time];
 }
 
 class LoadAttendanceHistory extends AttendanceEvent {

@@ -6,8 +6,8 @@ import '../models/attendance_model.dart';
 
 abstract class AttendanceLocalDataSource {
   Future<AttendanceModel?> getTodayAttendance();
-  Future<AttendanceModel> clockIn({DateTime? time});
-  Future<AttendanceModel> clockOut({DateTime? time});
+  Future<AttendanceModel> clockIn();
+  Future<AttendanceModel> clockOut();
   Future<List<AttendanceModel>> getAttendanceHistory(int year, int month);
   Future<List<AttendanceModel>> getAllAttendance();
   Future<void> markDaysOnLeave(DateTime startDate, DateTime endDate);
@@ -30,8 +30,8 @@ class AttendanceLocalDataSourceImpl implements AttendanceLocalDataSource {
   }
 
   @override
-  Future<AttendanceModel> clockIn({DateTime? time}) async {
-    final now = time ?? DateTime.now();
+  Future<AttendanceModel> clockIn() async {
+    final now = DateTime.now();
     final todayKey = DateTimeUtils.formatDateKey(now);
     final existing = await getTodayAttendance();
 
@@ -59,8 +59,8 @@ class AttendanceLocalDataSourceImpl implements AttendanceLocalDataSource {
   }
 
   @override
-  Future<AttendanceModel> clockOut({DateTime? time}) async {
-    final now = time ?? DateTime.now();
+  Future<AttendanceModel> clockOut() async {
+    final now = DateTime.now();
     final todayKey = DateTimeUtils.formatDateKey(now);
     final existing = await getTodayAttendance();
 

@@ -361,7 +361,7 @@ class DashboardScreen extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out from Pulse HRMS?'),
+        content: const Text('Are you sure you want to sign out from Arche HRMS?'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(

@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Pulse HRMS',
+                      'Arche HRMS',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,

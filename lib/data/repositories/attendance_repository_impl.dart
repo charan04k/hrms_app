@@ -14,13 +14,13 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   }
 
   @override
-  Future<AttendanceEntity> clockIn({DateTime? time}) {
-    return localDataSource.clockIn(time: time);
+  Future<AttendanceEntity> clockIn() {
+    return localDataSource.clockIn();
   }
 
   @override
-  Future<AttendanceEntity> clockOut({DateTime? time}) {
-    return localDataSource.clockOut(time: time);
+  Future<AttendanceEntity> clockOut() {
+    return localDataSource.clockOut();
   }
 
   @override

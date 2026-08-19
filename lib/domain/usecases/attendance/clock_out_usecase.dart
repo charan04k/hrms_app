@@ -6,7 +6,7 @@ class ClockOutUseCase {
 
   ClockOutUseCase({required this.repository});
 
-  Future<AttendanceEntity> call({DateTime? time}) {
-    return repository.clockOut(time: time);
+  Future<AttendanceEntity> call() {
+    return repository.clockOut();
   }
 }

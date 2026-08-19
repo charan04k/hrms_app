@@ -7,7 +7,7 @@ class ClockInUseCase {
 
   ClockInUseCase({required this.repository});
 
-  Future<AttendanceEntity> call({DateTime? time}) {
-    return repository.clockIn(time: time);
+  Future<AttendanceEntity> call() {
+    return repository.clockIn();
   }
 }
