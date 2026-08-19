@@ -255,6 +255,76 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                     const SizedBox(height: 12),
                   ],
 
+                  // Status Filter Chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _FilterChip(
+                          label: 'All',
+                          isSelected: state.selectedStatusFilter == null,
+                          onTap: () {
+                            context.read<AttendanceBloc>().add(
+                                  const FilterAttendanceStatusChanged(null),
+                                );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Present',
+                          isSelected: state.selectedStatusFilter == AttendanceStatus.present,
+                          color: AppColors.present,
+                          onTap: () {
+                            context.read<AttendanceBloc>().add(
+                                  const FilterAttendanceStatusChanged(
+                                    AttendanceStatus.present,
+                                  ),
+                                );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Absent',
+                          isSelected: state.selectedStatusFilter == AttendanceStatus.absent,
+                          color: AppColors.absent,
+                          onTap: () {
+                            context.read<AttendanceBloc>().add(
+                                  const FilterAttendanceStatusChanged(
+                                    AttendanceStatus.absent,
+                                  ),
+                                );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'On Leave',
+                          isSelected: state.selectedStatusFilter == AttendanceStatus.onLeave,
+                          color: AppColors.onLeave,
+                          onTap: () {
+                            context.read<AttendanceBloc>().add(
+                                  const FilterAttendanceStatusChanged(
+                                    AttendanceStatus.onLeave,
+                                  ),
+                                );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Holiday / Off',
+                          isSelected: state.selectedStatusFilter == AttendanceStatus.holiday,
+                          color: AppColors.holiday,
+                          onTap: () {
+                            context.read<AttendanceBloc>().add(
+                                  const FilterAttendanceStatusChanged(
+                                    AttendanceStatus.holiday,
+                                  ),
+                                );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
                   const SizedBox(height: 16),
 
                     if (state.isLoading)
@@ -409,4 +479,44 @@ class _AttendanceListItem extends StatelessWidget {
   }
 }
 
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final Color? color;
+  final VoidCallback onTap;
 
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final chipColor = color ?? AppColors.primary;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? chipColor : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? chipColor : AppColors.cardBorder,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+          ),
+        ),
+      ),
+    );
+  }
+}
