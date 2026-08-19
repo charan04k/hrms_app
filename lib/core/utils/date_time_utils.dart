@@ -32,14 +32,6 @@ class DateTimeUtils {
     return _keyFormat.format(dateTime);
   }
 
-  static DateTime parseDateKey(String key) {
-    return _keyFormat.parse(key);
-  }
-
-  static bool isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
   static bool isDateInRange(DateTime date, DateTime start, DateTime end) {
     final cleanDate = DateTime(date.year, date.month, date.day);
     final cleanStart = DateTime(start.year, start.month, start.day);

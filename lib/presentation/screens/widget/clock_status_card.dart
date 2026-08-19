@@ -29,24 +29,14 @@ class ClockStatusCard extends StatefulWidget {
 
 class _ClockStatusCardState extends State<ClockStatusCard>
     with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 0.85, end: 1.15).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
     super.dispose();
   }
 
@@ -114,57 +104,6 @@ class _ClockStatusCardState extends State<ClockStatusCard>
                     ),
                   ],
                 ),
-                if (isClockedIn)
-                  ScaleTransition(
-                    scale: _pulseAnimation,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.presentBg,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppColors.presentBorder),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.present,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'Working',
-                            style: TextStyle(
-                              color: AppColors.present,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-
-                else
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'Not Clocked In',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),

@@ -50,15 +50,7 @@ class FilterAttendanceStatusChanged extends AttendanceEvent {
   List<Object?> get props => [status];
 }
 
-class FilterAttendanceDateRangeChanged extends AttendanceEvent {
-  final DateTime? startDate;
-  final DateTime? endDate;
 
-  const FilterAttendanceDateRangeChanged({this.startDate, this.endDate});
-
-  @override
-  List<Object?> get props => [startDate, endDate];
-}
 
 class AttendanceTimerTick extends AttendanceEvent {
   const AttendanceTimerTick();

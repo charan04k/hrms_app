@@ -31,7 +31,7 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
     on<LoadAttendanceHistory>(_onLoadAttendanceHistory);
     on<ChangeAttendanceMonth>(_onChangeAttendanceMonth);
     on<FilterAttendanceStatusChanged>(_onFilterAttendanceStatusChanged);
-    on<FilterAttendanceDateRangeChanged>(_onFilterAttendanceDateRangeChanged);
+    // on<FilterAttendanceDateRangeChanged>(_onFilterAttendanceDateRangeChanged);
     on<AttendanceTimerTick>(_onAttendanceTimerTick);
 
     _startTicker();
@@ -241,25 +241,6 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
     ));
   }
 
-  void _onFilterAttendanceDateRangeChanged(
-      FilterAttendanceDateRangeChanged event,
-      Emitter<AttendanceState> emit,
-      ) {
-    final isClearing = event.startDate == null && event.endDate == null;
-    final filtered = _applyFilters(
-      state.monthlyHistory,
-      state.selectedStatusFilter,
-      event.startDate,
-      event.endDate,
-    );
-
-    emit(state.copyWith(
-      filterStartDate: event.startDate,
-      filterEndDate: event.endDate,
-      clearDateRangeFilter: isClearing,
-      filteredHistory: filtered,
-    ));
-  }
 
   List<AttendanceEntity> _applyFilters(
       List<AttendanceEntity> list,

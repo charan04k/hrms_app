@@ -43,42 +43,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
         );
   }
 
-  Future<void> _pickDateRange() async {
-    final state = context.read<AttendanceBloc>().state;
-    final now = DateTime.now();
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(now.year - 2),
-      lastDate: DateTime(now.year + 1),
-      initialDateRange: state.filterStartDate != null && state.filterEndDate != null
-          ? DateTimeRange(start: state.filterStartDate!, end: state.filterEndDate!)
-          : null,
-      builder: (ctx, child) {
-        return Theme(
-          data: Theme.of(ctx).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (!mounted) return;
-
-    if (picked != null) {
-      context.read<AttendanceBloc>().add(
-            FilterAttendanceDateRangeChanged(
-              startDate: picked.start,
-              endDate: picked.end,
-            ),
-          );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -213,48 +177,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Active Date Range Filter Banner (if any)
-                  if (state.filterStartDate != null && state.filterEndDate != null) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.filter_alt_rounded, size: 16, color: AppColors.primary),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Date Filter: ${DateTimeUtils.formatDate(state.filterStartDate!)} - ${DateTimeUtils.formatDate(state.filterEndDate!)}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryDark,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close_rounded, size: 16),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            onPressed: () {
-                              context.read<AttendanceBloc>().add(
-                                    const FilterAttendanceDateRangeChanged(
-                                      startDate: null,
-                                      endDate: null,
-                                    ),
-                                  );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-
                   // Status Filter Chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -343,12 +265,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                         onAction: () {
                           context.read<AttendanceBloc>().add(
                                 const FilterAttendanceStatusChanged(null),
-                              );
-                          context.read<AttendanceBloc>().add(
-                                const FilterAttendanceDateRangeChanged(
-                                  startDate: null,
-                                  endDate: null,
-                                ),
                               );
                         },
                       )
